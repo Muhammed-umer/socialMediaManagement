@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+
+<!-- Row fragment returned by HTMX partial requests -->
+<th:block th:fragment="rows">
+
+    <!-- Empty state when no posts found -->
+    <tr th:if="${#lists.isEmpty(posts)}">
+        <td colspan="7">
+            <div style="padding: 60px 24px; text-align: center; color: #94a3b8;">
+                <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🔍</div>
+                <p style="font-size: 16px; font-weight: 600; color: #475569; margin-bottom: 4px;">No posts found for this keyword</p>
+                <p style="font-size: 13px;">Try another search or check back later</p>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Post rows -->
+    <tr th:each="p, iterStat : ${posts}" 
+        class="video-row"
+        th:attr="data-thumb=${p.thumbnailUrl}, data-url=${p.postUrl != null ? p.postUrl : 'https://www.instagram.com/explore/tags/' + p.keyword + '/' }">
+
+        <!-- Serial Number -->
+        <td th:text="${iterStat.count}" style="font-weight: 700; color: #94a3b8; font-size: 13px;"></td>
+
+        <!-- Content/Title: Visible and Clickable -->
+        <td>
+            <div class="title-cell"
+                 th:text="${p.title}"
+                 th:title="${p.title}">
+            </div>
+        </td>
+
+        <!-- Account -->
+        <td>
+            <div class="channel-info">
+                <div class="channel-icon"
+                     th:text="${p.account != null and p.account.length() > 0 ? p.account.substring(0,1).toUpperCase() : '?'}">
+                </div>
+                <span th:text="${p.account}"></span>
+            </div>
+        </td>
+
+        <!-- Type -->
+        <td>
+            <span class="views-tag" th:text="${p.contentType != null ? p.contentType : 'Post'}" style="background:#fce7f3;color:#be185d;"></span>
+        </td>
+
+        <!-- Likes -->
+        <td>
+            <span class="views-tag">
+                <span th:if="${p.likes != null and p.likes >= 1000000}"
+                      th:text="${#numbers.formatDecimal(p.likes / 1000000.0, 1, 1) + 'M'}"></span>
+                <span th:if="${p.likes != null and p.likes >= 1000 and p.likes < 1000000}"
+                      th:text="${#numbers.formatDecimal(p.likes / 1000.0, 1, 1) + 'K'}"></span>
+                <span th:if="${p.likes != null and p.likes < 1000}"
+                      th:text="${p.likes}"></span>
+                <span th:if="${p.likes == null}">—</span>
+            </span>
+        </td>
+
+        <!-- Comments -->
+        <td class="duration-tag">
+            <span th:text="${p.comments}"></span>
+        </td>
+
+        <!-- Published Date -->
+        <td th:text="${p.publishedDateFormatted}" style="color: #64748b; font-size: 13px;"></td>
+
+    </tr>
+
+</th:block>
+
+</body>
+</html>

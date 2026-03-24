@@ -1,0 +1,18 @@
+youtube:
+  apiKey: AIzaSyAdeO-0srS9kq8YtKEtt7XbKgj3UvJPZho
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/social_monitor
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 9090
+
+instagram:
+  accessToken: EAAUuz6nRENIBRJSeCM2UCXYD2doJOyuPRdk5YeSZAZCHrriRZBJtyR0tTesPC9GqaTJASTi7PqnE2QsUSmVpFwODnY1fGDgyrZBQQojCKL4ZCP3iT9oqOMf3P7bG04YzwZAliZAGTyvXnXr8UbnSUuVNRFjNfZAEkgvpoizKZAyDcIce9DUuFvCIvj6AS71XohkZCm
+  businessAccountId: "17841443190536872"

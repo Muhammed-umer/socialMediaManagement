@@ -1,0 +1,9 @@
+com\monitor\client\YouTubeClient.class
+com\monitor\Application.class
+com\monitor\service\InstaService.class
+com\monitor\model\Video.class
+com\monitor\repo\InstaRepo.class
+com\monitor\controller\DashboardController.class
+com\monitor\repo\VideoRepo.class
+com\monitor\model\Insta.class
+com\monitor\service\YouTubeService.class

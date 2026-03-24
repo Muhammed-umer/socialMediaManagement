@@ -1,0 +1,18 @@
+youtube:
+  apiKey: YOUTUBE_API_KEY_PLACEHOLDER
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/social_monitor
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 9090
+
+instagram:
+  accessToken: INSTAGRAM_TOKEN_PLACEHOLDER
+  businessAccountId: "17841443190536872"

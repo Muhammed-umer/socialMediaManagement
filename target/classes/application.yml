@@ -16,3 +16,10 @@ server:
 instagram:
   accessToken: EAAUuz6nRENIBRJSeCM2UCXYD2doJOyuPRdk5YeSZAZCHrriRZBJtyR0tTesPC9GqaTJASTi7PqnE2QsUSmVpFwODnY1fGDgyrZBQQojCKL4ZCP3iT9oqOMf3P7bG04YzwZAliZAGTyvXnXr8UbnSUuVNRFjNfZAEkgvpoizKZAyDcIce9DUuFvCIvj6AS71XohkZCm
   businessAccountId: "17841443190536872"
+
+twitter:
+  apiKey: deb242b238msh26a8efc5c285899p12dfa5jsnac8a1f7cf649
+  host: twitter241.p.rapidapi.com
+
+huggingface:
+  apiKey: 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

@@ -27,7 +27,7 @@ public class InstaClient {
         try {
             Map<String, Object> response = rest.getForObject(url, Map.class);
             System.out.println("Instagram API Response for @" + username + ": " + response);
-            
+
             if (response != null && response.containsKey("business_discovery")) {
                 Map<String, Object> discovery = (Map<String, Object>) response.get("business_discovery");
                 if (discovery != null && discovery.containsKey("media")) {

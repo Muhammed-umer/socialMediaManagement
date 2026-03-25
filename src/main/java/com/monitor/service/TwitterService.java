@@ -83,7 +83,7 @@ public class TwitterService {
             if (rawResponseBody == null) {
                 System.out.println("🚨 API FAILED COMPLETELY - USING DB FALLBACK");
 
-                List<TwitterPost> dbPosts = twitterPostRepository.findTop10ByOrderByIdDesc();
+                List<TwitterPost> dbPosts = twitterPostRepository.findTop20ByOrderByIdDesc();
 
                 for (TwitterPost post : dbPosts) {
                     String createdAtStr = post.getCreatedAt() != null ? post.getCreatedAt() : "";
@@ -227,5 +227,24 @@ public class TwitterService {
             // ✅ FIX: Pass the hashtag into the recursive loops
             node.elements().forEachRemaining(child -> extractTweetsRecursive(child, tweets, hashtag));
         }
+    }
+
+    public List<Tweet> getLatestSavedTweets() {
+        List<TwitterPost> dbPosts = twitterPostRepository.findTop20ByOrderByIdDesc();
+        List<Tweet> tweets = new ArrayList<>();
+        for (TwitterPost post : dbPosts) {
+            String createdAtStr = post.getCreatedAt() != null ? post.getCreatedAt() : "";
+            tweets.add(new Tweet(
+                    post.getUsername(),
+                    post.getTweetText(),
+                    post.getLikes(),
+                    post.getComments(),
+                    post.getRetweets(),
+                    createdAtStr,
+                    post.getSource(),
+                    post.getSentiment()
+            ));
+        }
+        return tweets;
     }
 }

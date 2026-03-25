@@ -563,38 +563,7 @@
                 if (!data || data.length === 0) {
                     tableBody.innerHTML = `<tr><td colspan="9"><div style="padding: 60px 24px; text-align: center; color: #94a3b8;">No tweets found for this hashtag</div></td></tr>`;
                 } else {
-                    let html = '';
-                    data.forEach((tweet, idx) => {
-                        const firstChar = tweet.username ? tweet.username.charAt(0).toUpperCase() : '?';
-
-                        // ✅ FIXED LINK LOGIC HERE
-                        const sourceUrl = tweet.source ? tweet.source.trim() : '';
-                        const sourceHtml = sourceUrl.includes('http')
-                            ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="tweet-link-btn">↗ Open Tweet</a>`
-                            : `<span class="tweet-source-text">${sourceUrl || 'N/A'}</span>`;
-
-                        html += `
-                        <tr class="video-row">
-                            <td style="font-weight: 700; color: #94a3b8; font-size: 13px;">${idx + 1}</td>
-                            <td>
-                                <div class="channel-info">
-                                    <div class="channel-icon">${firstChar}</div>
-                                    <span>${tweet.username || 'Unknown'}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="title-cell">${tweet.text || ''}</div>
-                            </td>
-                            <td><span style="font-weight: 600; color: #ef4444;">${tweet.likes || 0}</span></td>
-                            <td><span style="font-weight: 600; color: #10b981;">${tweet.comments || 0}</span></td>
-                            <td><span style="font-weight: 600; color: #8b5cf6;">${tweet.retweets || 0}</span></td>
-                            <td class="duration-tag">${tweet.createdAt || 'N/A'}</td>
-                            <td>${sourceHtml}</td>
-                            <td>${getSentimentBadge(tweet.sentiment)}</td>
-                        </tr>
-                    `;
-                    });
-                    tableBody.innerHTML = html;
+                    renderTweetsToTable(data);
                 }
             } catch (error) {
                 console.error('Error fetching tweets:', error);
@@ -603,6 +572,57 @@
                 loading.style.display = 'none';
             }
         }
+
+        function renderTweetsToTable(data) {
+            let html = '';
+            data.forEach((tweet, idx) => {
+                const firstChar = tweet.username ? tweet.username.charAt(0).toUpperCase() : '?';
+
+                const sourceUrl = tweet.source ? tweet.source.trim() : '';
+                const sourceHtml = sourceUrl.includes('http')
+                    ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="tweet-link-btn">↗ Open Tweet</a>`
+                    : `<span class="tweet-source-text">${sourceUrl || 'N/A'}</span>`;
+
+                html += `
+                <tr class="video-row">
+                    <td style="font-weight: 700; color: #94a3b8; font-size: 13px;">${idx + 1}</td>
+                    <td>
+                        <div class="channel-info">
+                            <div class="channel-icon">${firstChar}</div>
+                            <span>${tweet.username || 'Unknown'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="title-cell">${tweet.text || ''}</div>
+                    </td>
+                    <td><span style="font-weight: 600; color: #ef4444;">${tweet.likes || 0}</span></td>
+                    <td><span style="font-weight: 600; color: #10b981;">${tweet.comments || 0}</span></td>
+                    <td><span style="font-weight: 600; color: #8b5cf6;">${tweet.retweets || 0}</span></td>
+                    <td class="duration-tag">${tweet.createdAt || 'N/A'}</td>
+                    <td>${sourceHtml}</td>
+                    <td>${getSentimentBadge(tweet.sentiment)}</td>
+                </tr>
+            `;
+            });
+            tableBody.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            loading.style.display = 'flex';
+            try {
+                const res = await fetch('/api/twitter/latest');
+                const data = await res.json();
+                if (!data || data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 60px;">Add hashtags above to start monitoring</td></tr>`;
+                } else {
+                    renderTweetsToTable(data);
+                }
+            } catch (error) {
+                console.error('Error fetching latest tweets:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
     </script>
 
 </body>

@@ -26,4 +26,10 @@ public class TwitterController {
     public List<Tweet> searchTwitter(@RequestParam("hashtag") String hashtag) {
         return twitterService.search(hashtag);
     }
+
+    @GetMapping("/api/twitter/latest")
+    @ResponseBody
+    public List<Tweet> getLatestTweets() {
+        return twitterService.getLatestSavedTweets();
+    }
 }

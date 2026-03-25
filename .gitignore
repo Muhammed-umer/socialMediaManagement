@@ -1,10 +1,43 @@
+# HELP
 HELP.md
+
+# =========================
+# Java / Spring Boot / Maven
+# =========================
+
+# Compiled class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Keep target inside src
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# =========================
+# IDEs
+# =========================
+
+## STS
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +46,15 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+## IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
+out/
+.idea_modules/
 
-### NetBeans ###
+## NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,19 +64,45 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+## VS Code
 .vscode/
 
-### Logs ###
+# =========================
+# Logs
+# =========================
 logs/
 *.log
 !git.log
+build.log
+db_check.log
 
-### OS Files ###
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# =========================
+# Environment Files
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env*
+
+# =========================
+# OS Files
+# =========================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
 
-### Project Specific ###
+# =========================
+# Misc / Project Specific
+# =========================
 response.json
-
-
+vue_data.html

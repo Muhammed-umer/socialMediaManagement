@@ -1,9 +1,17 @@
 com\monitor\client\YouTubeClient.class
+com\monitor\service\TwitterService.class
 com\monitor\Application.class
+com\monitor\controller\TwitterController.class
 com\monitor\service\InstaService.class
+com\monitor\client\InstaClient.class
 com\monitor\model\Video.class
 com\monitor\repo\InstaRepo.class
 com\monitor\controller\DashboardController.class
+com\monitor\service\SentimentService.class
+com\monitor\config\NavigationInjectionFilter.class
+com\monitor\repository\TwitterPostRepository.class
+com\monitor\model\TwitterPost.class
 com\monitor\repo\VideoRepo.class
+com\monitor\model\Tweet.class
 com\monitor\model\Insta.class
 com\monitor\service\YouTubeService.class

@@ -1,0 +1,71 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="rows">
+    <div th:if="${error != null}" style="text-align: center; color: var(--primary); padding: 40px;">
+        <p>Error: <span th:text="${error}"></span></p>
+    </div>
+    
+    <div th:if="${response != null}" class="insights-section">
+        <div class="insight-card">
+            <div class="insight-val" th:text="${response.analysis.positive}">0</div>
+            <div class="insight-label">Positive Posts</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-val" th:text="${response.analysis.negative}">0</div>
+            <div class="insight-label">Negative Posts</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-val" th:text="${response.analysis.neutral}">0</div>
+            <div class="insight-label">Neutral Posts</div>
+        </div>
+        <div class="insight-card">
+            <div class="insight-val" th:text="${response.total_posts}">0</div>
+            <div class="insight-label">Total Posts</div>
+        </div>
+    </div>
+    
+    <div th:if="${response != null}" class="results-box">
+        <div class="table-wrap">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Username</th>
+                        <th style="width: 45%;">Caption Preview</th>
+                        <th>Sentiment</th>
+                        <th>Likes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="post, stat : ${posts}" class="video-row" th:attr="data-url=${post.url}">
+                        <td th:text="${stat.count}">1</td>
+                        <td>
+                            <a class="channel-info" th:href="${post.url}" target="_blank" style="text-decoration: none; color: inherit; cursor: pointer;">
+                                <div class="channel-icon" th:text="${#strings.substring(post.username,0,1).toUpperCase()}">U</div>
+                                <span th:text="${post.username}" style="font-weight: 600;">user</span>
+                            </a>
+                        </td>
+                        <td>
+                            <a th:href="${post.url}" target="_blank" class="title-cell" th:text="${post.caption}">Caption</a>
+                        </td>
+                        <td>
+                            <span th:class="'sentiment-tag sentiment-' + ${post.sentiment}" th:text="${#strings.capitalize(post.sentiment)}">Positive</span>
+                        </td>
+                        <td>
+                            <span class="views-tag" th:text="${post.likes + ' Likes'}">100 Likes</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div th:if="${response != null && not #lists.isEmpty(response.top_accounts)}" style="margin-top: 20px;">
+        <h4 style="margin-bottom: 10px; color: var(--text-secondary);">Top Active Accounts:</h4>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <span th:each="acc : ${response.top_accounts}" style="background: #f1f5f9; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--text-main);">
+                @<span th:text="${acc.username}">username</span> (<span th:text="${acc.post_count}">5</span> posts)
+            </span>
+        </div>
+    </div>
+</div>
+</html>

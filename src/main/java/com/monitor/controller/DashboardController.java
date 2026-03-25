@@ -6,6 +6,8 @@ import com.monitor.service.InstaService;
 import com.monitor.model.Video;
 import com.monitor.repo.VideoRepo;
 import com.monitor.service.YouTubeService;
+import com.monitor.service.InstagramHashtagService;
+import com.monitor.model.dto.HashtagAnalysisResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +24,8 @@ public class DashboardController {
     
     private final InstaRepo instaRepo;
     private final InstaService instaService;
+    
+    private final InstagramHashtagService hashtagService;
 
     @GetMapping("/")
     public String index() {
@@ -97,5 +101,25 @@ public class DashboardController {
 
         model.addAttribute("posts", posts);
         return "fragments_insta :: rows";
+    }
+
+    @GetMapping("/insta2")
+    public String insta2Dashboard(Model model){
+        return "insta2";
+    }
+
+    @GetMapping("/insta2/data")
+    public String insta2Data(Model model, @RequestParam("keyword") String keyword){
+        if(keyword != null && !keyword.isEmpty()){
+            try {
+                String tag = keyword.split(",")[0].trim();
+                HashtagAnalysisResponse response = hashtagService.analyzeHashtag(tag);
+                model.addAttribute("response", response);
+                model.addAttribute("posts", response.getPosts());
+            } catch (Exception e) {
+                model.addAttribute("error", e.getMessage());
+            }
+        }
+        return "fragments_insta2 :: rows";
     }
 }

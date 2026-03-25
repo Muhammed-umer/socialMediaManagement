@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 D:\socialMediaManagement\src\main\java\com\monitor\controller\TwitterController.java
 D:\socialMediaManagement\src\main\java\com\monitor\model\TwitterPost.java
 D:\socialMediaManagement\src\main\java\com\monitor\Application.java
@@ -15,3 +16,20 @@ D:\socialMediaManagement\src\main\java\com\monitor\controller\DashboardControlle
 D:\socialMediaManagement\src\main\java\com\monitor\model\Tweet.java
 D:\socialMediaManagement\src\main\java\com\monitor\service\SentimentService.java
 D:\socialMediaManagement\src\main\java\com\monitor\config\NavigationInjectionFilter.java
+=======
+E:\socialMediaManagement\src\main\java\com\monitor\service\InstagramHashtagService.java
+E:\socialMediaManagement\src\main\java\com\monitor\Application.java
+E:\socialMediaManagement\src\main\java\com\monitor\model\dto\HashtagAnalysisResponse.java
+E:\socialMediaManagement\src\main\java\com\monitor\service\InstaService.java
+E:\socialMediaManagement\src\main\java\com\monitor\model\Insta.java
+E:\socialMediaManagement\src\main\java\com\monitor\client\InstaClient.java
+E:\socialMediaManagement\src\main\java\com\monitor\controller\InstagramHashtagController.java
+E:\socialMediaManagement\src\main\java\com\monitor\model\Video.java
+E:\socialMediaManagement\src\main\java\com\monitor\repo\VideoRepo.java
+E:\socialMediaManagement\src\main\java\com\monitor\client\YouTubeClient.java
+E:\socialMediaManagement\src\main\java\com\monitor\repo\InstagramHashtagCacheRepo.java
+E:\socialMediaManagement\src\main\java\com\monitor\repo\InstaRepo.java
+E:\socialMediaManagement\src\main\java\com\monitor\service\YouTubeService.java
+E:\socialMediaManagement\src\main\java\com\monitor\model\InstagramHashtagCache.java
+E:\socialMediaManagement\src\main\java\com\monitor\controller\DashboardController.java
+>>>>>>> f9e95444ea18137400fa3e09b1d8fdfe648faaaa

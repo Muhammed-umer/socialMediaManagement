@@ -23,8 +23,17 @@ public class TwitterController {
 
     @GetMapping("/api/twitter/search")
     @ResponseBody
-    public List<Tweet> searchTwitter(@RequestParam("hashtag") String hashtag) {
-        return twitterService.search(hashtag);
+    public Object searchTwitter(@RequestParam("hashtag") String hashtag) {
+        List<Tweet> tweets = twitterService.search(hashtag);
+
+        if (tweets == null || tweets.isEmpty()) {
+            return java.util.Map.of(
+                "message", "No tweets found",
+                "tweets", java.util.Collections.emptyList()
+            );
+        }
+
+        return tweets;
     }
 
     @GetMapping("/api/twitter/latest")

@@ -1,26 +1,6 @@
-<html xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="rows">
-    <div th:if="${error != null}" style="text-align: center; color: var(--primary); padding: 40px;">
-        <p>Error: <span th:text="${error}"></span></p>
-    </div>
-    
-    <div th:if="${response != null}" class="insights-section">
-        <div class="insight-card">
-            <div class="insight-val" th:text="${response.analysis.positive}">0</div>
-            <div class="insight-label">Positive Posts</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-val" th:text="${response.analysis.negative}">0</div>
-            <div class="insight-label">Negative Posts</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-val" th:text="${response.analysis.neutral}">0</div>
-            <div class="insight-label">Neutral Posts</div>
-        </div>
-        <div class="insight-card">
-            <div class="insight-val" th:text="${response.total_posts}">0</div>
-            <div class="insight-label">Total Posts</div>
-        </div>
+    <div th:if="${error != null}" style="text-align: center; color: #ef4444; padding: 40px; background: #fee2e2; border-radius: 12px; margin-bottom: 20px;">
+        <p style="font-weight: 600;">Error: <span th:text="${error}"></span></p>
     </div>
     
     <div th:if="${response != null}" class="results-box">
@@ -29,42 +9,55 @@
                 <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
-                        <th>Username</th>
-                        <th style="width: 45%;">Caption Preview</th>
-                        <th>Sentiment</th>
+                        <th style="width: 35%;">Post Content</th>
+                        <th style="width: 15%;">Account</th>
+                        <th>Type</th>
                         <th>Likes</th>
+                        <th>Comments</th>
+                        <th>Published</th>
+                        <th>Sentiment</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr th:each="post, stat : ${posts}" class="video-row" th:attr="data-url=${post.url}">
-                        <td th:text="${stat.count}">1</td>
+                <tbody id="tableBody">
+                    <!-- Empty State Row -->
+                    <tr th:if="${#lists.isEmpty(response.posts)}">
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 80px;">
+                            <div style="font-size: 40px; margin-bottom: 15px; opacity: 0.3;">🚫</div>
+                            <div style="font-size: 18px; font-weight: 600;">No posts found for this hashtag</div>
+                            <div style="font-size: 14px; margin-top: 8px;">Try searching for a different trend or keyword.</div>
+                        </td>
+                    </tr>
+
+                    <!-- Data Rows -->
+                    <tr th:each="post, stat : ${response.posts}" class="video-row">
+                        <td style="font-weight: 700; color: #94a3b8; font-size: 13px;" th:text="${stat.count}">1</td>
                         <td>
-                            <a class="channel-info" th:href="${post.url}" target="_blank" style="text-decoration: none; color: inherit; cursor: pointer;">
-                                <div class="channel-icon" th:text="${#strings.substring(post.username,0,1).toUpperCase()}">U</div>
-                                <span th:text="${post.username}" style="font-weight: 600;">user</span>
-                            </a>
+                            <div class="title-cell" th:text="${post.caption}" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 500px;">Caption</div>
+                            <div style="margin-top: 8px;">
+                                <a th:href="${post.url}" target="_blank" class="tweet-link-btn" style="text-decoration: none; font-size: 12px; padding: 4px 10px;">↗ View on Instagram</a>
+                            </div>
                         </td>
                         <td>
-                            <a th:href="${post.url}" target="_blank" class="title-cell" th:text="${post.caption}">Caption</a>
+                            <div class="channel-info">
+                                <div class="channel-icon" th:text="${#strings.isEmpty(post.username) ? '?' : #strings.substring(post.username,0,1).toUpperCase()}">U</div>
+                                <span th:text="${post.username}" style="font-weight: 600; color: var(--text-main);">user</span>
+                            </div>
                         </td>
                         <td>
-                            <span th:class="'sentiment-tag sentiment-' + ${post.sentiment}" th:text="${#strings.capitalize(post.sentiment)}">Positive</span>
+                            <span th:if="${post.type == 'REEL'}" style="font-size: 12px; font-weight: 600; color: #8b5cf6; background: #ede9fe; padding: 4px 10px; border-radius: 100px;">REEL</span>
+                            <span th:if="${post.type != 'REEL'}" style="font-size: 12px; font-weight: 600; color: #0ea5e9; background: #e0f2fe; padding: 4px 10px; border-radius: 100px;">POST</span>
                         </td>
+                        <td><span style="font-weight: 600; color: #ef4444;" th:text="${post.likes}">0</span></td>
+                        <td><span style="font-weight: 600; color: #10b981;" th:text="${post.comments}">0</span></td>
+                        <td class="duration-tag" th:text="${post.timestamp}">N/A</td>
                         <td>
-                            <span class="views-tag" th:text="${post.likes + ' Likes'}">100 Likes</span>
+                            <span th:if="${post.sentiment == 'positive'}" style="font-size: 12px; font-weight: 600; color: #15803d; background: #dcfce7; padding: 4px 10px; border-radius: 100px;">Positive</span>
+                            <span th:if="${post.sentiment == 'negative'}" style="font-size: 12px; font-weight: 600; color: #b91c1c; background: #fee2e2; padding: 4px 10px; border-radius: 100px;">Negative</span>
+                            <span th:if="${post.sentiment == 'neutral' || post.sentiment == null}" style="font-size: 12px; font-weight: 600; color: #475569; background: #e2e8f0; padding: 4px 10px; border-radius: 100px;">Neutral</span>
                         </td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-    
-    <div th:if="${response != null && not #lists.isEmpty(response.top_accounts)}" style="margin-top: 20px;">
-        <h4 style="margin-bottom: 10px; color: var(--text-secondary);">Top Active Accounts:</h4>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <span th:each="acc : ${response.top_accounts}" style="background: #f1f5f9; padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 500; color: var(--text-main);">
-                @<span th:text="${acc.username}">username</span> (<span th:text="${acc.post_count}">5</span> posts)
-            </span>
         </div>
     </div>
 </div>

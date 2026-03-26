@@ -181,58 +181,24 @@
             align-items: flex-start;
         }
 
-        .tag-input-container {
+        .single-keyword-input {
             flex: 1;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
             padding: 12px 16px;
             background: #f1f5f9;
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             min-height: 56px;
-            transition: all 0.2s;
-            cursor: text;
-        }
-
-        .tag-input-container:focus-within {
-            background: #fff;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--primary-glow);
-        }
-
-        .tag {
-            background: var(--primary);
-            color: #fff;
-            padding: 4px 12px;
-            border-radius: 100px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .tag-remove {
-            cursor: pointer;
-            opacity: 0.7;
-            font-size: 18px;
-            line-height: 1;
-        }
-
-        .tag-remove:hover { opacity: 1; }
-
-        .keyword-entry-field {
-            border: none;
-            background: transparent;
-            outline: none;
-            flex: 1;
-            min-width: 150px;
             font-family: inherit;
             font-size: 16px;
             color: var(--text-main);
-            padding: 6px 0;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .single-keyword-input:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
         .btn-search {
@@ -471,22 +437,18 @@
             hx-target="#tableBody"
             hx-indicator="#loading"
             hx-swap="innerHTML">
-            
-            <input type="hidden" name="keyword" id="finalKeywordInput">
-            
-            <div class="tag-input-container" onclick="document.getElementById('keywordEntry').focus()">
-                <div id="tagList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-                <input
-                    type="text"
-                    id="keywordEntry"
-                    class="keyword-entry-field"
-                    placeholder="Search using keyword"
-                    autocomplete="off">
-            </div>
+            <input
+                type="text"
+                name="keyword"
+                id="keywordEntry"
+                class="single-keyword-input"
+                placeholder="Enter a keyword to search"
+                autocomplete="off"
+                required>
             <button type="submit" class="btn-search">Search Now</button>
         </form>
         <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-            Tip: Press <strong>Enter</strong> or <strong>Comma</strong> to add multiple keywords.
+            Tip: Press <strong>Enter</strong> to search for a keyword.
         </p>
         <div id="loading">
             <div class="spinner"></div>
@@ -506,14 +468,11 @@
                         <th>Views</th>
                         <th>Duration</th>
                         <th>Published</th>
+                        <th>Sentiment</th>
+                        <th>Summary</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 60px;">
-                            Add keywords above to start monitoring
-                        </td>
-                    </tr>
+                <tbody id="tableBody" th:insert="~{fragments :: rows}">
                 </tbody>
             </table>
         </div>
@@ -521,73 +480,21 @@
 </div> <!-- main-wrapper -->
 
 <script>
-    const form = document.getElementById('searchForm');
-    const input = document.getElementById('keywordEntry');
-    const tagList = document.getElementById('tagList');
-    const finalInput = document.getElementById('finalKeywordInput');
-    let tags = [];
-
-    function updateTagsUI() {
-        tagList.innerHTML = '';
-        tags.forEach((tag, index) => {
-            const tagEl = document.createElement('div');
-            tagEl.className = 'tag';
-            tagEl.innerHTML = `<span>${tag}</span><span class="tag-remove" onclick="removeTag(${index})">&times;</span>`;
-            tagList.appendChild(tagEl);
-        });
-        
-        // Sync with hidden input
-        finalInput.value = tags.join(',');
-        
-        // Dynamic placeholder
-        input.placeholder = tags.length > 0 ? '' : 'Search using keyword';
-    }
-
-    window.removeTag = function(index) {
-        tags.splice(index, 1);
-        updateTagsUI();
-    };
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            const val = input.value.trim().replace(/,/g, '');
-            if (val && !tags.includes(val)) {
-                tags.push(val);
-                input.value = '';
-                updateTagsUI();
-            }
-        } else if (e.key === 'Backspace' && !input.value && tags.length > 0) {
-            tags.pop();
-            updateTagsUI();
-        }
-    });
-
-    document.body.addEventListener('htmx:configRequest', (event) => {
-        if (event.detail.elt.id === 'searchForm') {
-            const currentVal = input.value.trim();
-            if (currentVal && !tags.includes(currentVal)) {
-                tags.push(currentVal);
-                input.value = '';
-                updateTagsUI();
-            }
-            
-            // Re-sync final input one last time
-            finalInput.value = tags.join(',');
-
-            if (tags.length === 0) {
-                event.preventDefault();
-                alert('Please add at least one keyword.');
-            }
-        }
-    });
-
     // Mouse Follow Preview Logic
     document.addEventListener('mousemove', (e) => {
-        const row = e.target.closest('.video-row');
         const pre = document.getElementById('videoPreview');
         
-        if (row && pre) {
+        // Disable floating thumbnail if the user is clicking/dragging elements on the page
+        if (e.buttons > 0) {
+            if (pre) pre.classList.remove('active');
+            return;
+        }
+
+        const row = e.target.closest('.video-row');
+        const td = e.target.closest('td');
+        const isTitleTd = td && td.querySelector('.title-cell') !== null;
+        
+        if (row && isTitleTd && pre) {
             const thumb = row.getAttribute('data-thumb');
             const title = row.querySelector('.title-cell').innerText;
             

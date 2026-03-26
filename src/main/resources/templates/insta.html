@@ -508,12 +508,7 @@
                         <th>Published</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 60px;">
-                            Add keywords above to start monitoring
-                        </td>
-                    </tr>
+                <tbody id="tableBody" th:insert="~{fragments_insta :: rows}">
                 </tbody>
             </table>
         </div>
@@ -584,8 +579,15 @@
 
     // Mouse Follow Preview Logic
     document.addEventListener('mousemove', (e) => {
-        const row = e.target.closest('.video-row');
         const pre = document.getElementById('videoPreview');
+        
+        // Disable floating thumbnail if the user is clicking/dragging elements on the page
+        if (e.buttons > 0) {
+            if (pre) pre.classList.remove('active');
+            return;
+        }
+
+        const row = e.target.closest('.video-row');
         
         if (row && pre) {
             const thumb = row.getAttribute('data-thumb');

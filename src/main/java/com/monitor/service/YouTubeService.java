@@ -5,103 +5,108 @@ import com.monitor.model.Video;
 import com.monitor.repo.VideoRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 public class YouTubeService {
 
+    @Value("${huggingface.apiKey:}")
+    private String hfApiKey;
+
     private final YouTubeClient client;
     private final VideoRepo repo;
 
+    public void fetch(String keyword){
+        Map res = client.search(keyword);
+        List<Map> items = (List<Map>) res.get("items");
+        List<String> ids = new ArrayList<>();
 
+        for(Map item : items){
+            Map idMap = (Map) item.get("id");
+            ids.add((String) idMap.get("videoId"));
+        }
 
-    public void fetch(String keywordInput){
+        Map details = client.getVideoDetails(String.join(",", ids));
+        List<Map> videos = (List<Map>) details.get("items");
 
-        String[] keywords = keywordInput.split(",");
+        for(Map v : videos){
+            String id = (String) v.get("id");
+            Map snippet = (Map) v.get("snippet");
+            Map stats = (Map) v.get("statistics");
+            Map content = (Map) v.get("contentDetails");
 
-        for(String rawKeyword : keywords) {
-            String keyword = rawKeyword.trim();
-            if(keyword.isEmpty()) continue;
+            String publishedAt = (String) snippet.get("publishedAt");
+            Instant instant = Instant.parse(publishedAt);
+            int videoYear = instant.atZone(ZoneId.systemDefault()).getYear();
+            int currentYear = java.time.Year.now().getValue();
 
-            Map<String, Object> res = client.search(keyword);
-            List<Map<String, Object>> items = (List<Map<String, Object>>) res.get("items");
+            if(videoYear != currentYear) continue; // Skip if not current year
 
-            List<String> ids = new ArrayList<>();
+            Video video = new Video();
+            video.setId(id);
+            video.setTitle((String) snippet.get("title"));
+            video.setChannel((String) snippet.get("channelTitle"));
+            video.setViews(Long.parseLong((String) stats.getOrDefault("viewCount", "0")));
+            video.setDuration(java.time.Duration.parse((String) content.get("duration")).getSeconds());
+            video.setPublishedAt(publishedAt);
+            video.setPublishedDateFormatted(instant.atZone(ZoneId.systemDefault())
+                    .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
 
-            for(Map<String, Object> item : items){
-                Map<String, Object> idMap = (Map<String, Object>) item.get("id");
-                ids.add((String) idMap.get("videoId"));
+            video.setKeyword(keyword);
+            video.setContentType(video.getDuration() <= 60 ? "Short" : "Video");
+            
+            try {
+                Map thumbnails = (Map) snippet.get("thumbnails");
+                if (thumbnails != null && thumbnails.get("high") != null) {
+                    video.setThumbnailUrl((String) ((Map) thumbnails.get("high")).get("url"));
+                }
+            } catch (Exception e) {}
+
+            try {
+                String videoDesc = (String) snippet.getOrDefault("description", "");
+                
+                ProcessBuilder pb = new ProcessBuilder("python", "scripts/youtube_analyzer.py", 
+                    id, video.getTitle(), videoDesc, hfApiKey);
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                
+                BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                StringBuilder output = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line);
+                }
+                process.waitFor();
+                
+                String jsonOutput = output.toString();
+                if (jsonOutput.contains("{")) {
+                    jsonOutput = jsonOutput.substring(jsonOutput.indexOf("{"));
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, String> analysis = mapper.readValue(jsonOutput, Map.class);
+                    video.setSentiment(analysis.getOrDefault("sentiment", "neutral"));
+                    video.setSummary(analysis.getOrDefault("summary", ""));
+                } else {
+                    video.setSentiment("neutral");
+                    video.setSummary("Analysis failed: " + jsonOutput);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                video.setSentiment("neutral");
+                video.setSummary("Error executing analyzer");
             }
 
-            Map<String, Object> details = client.getVideoDetails(String.join(",", ids));
-            List<Map<String, Object>> videos = (List<Map<String, Object>>) details.get("items");
-
-            for(Map<String, Object> v : videos){
-
-
-                String id = (String) v.get("id");
-
-                Map<String, Object> snippet = (Map<String, Object>) v.get("snippet");
-                Map<String, Object> stats = (Map<String, Object>) v.get("statistics");
-                Map<String, Object> content = (Map<String, Object>) v.get("contentDetails");
-
-                String title = (String) snippet.get("title");
-                String channel = (String) snippet.get("channelTitle");
-                String publishedAt = (String) snippet.get("publishedAt");
-                String formattedDate = "";
-
-                try {
-                    Instant instant = Instant.parse(publishedAt);
-
-                    // include seconds in published timestamp
-                    formattedDate = instant
-                            .atZone(ZoneId.systemDefault())
-                            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-
-                } catch (Exception e) {
-                    formattedDate = publishedAt; // fallback
-                }
-                long views = Long.parseLong((String) stats.getOrDefault("viewCount", "0"));
-
-                String durationStr = (String) content.get("duration");
-                long seconds = java.time.Duration.parse(durationStr).getSeconds();
-                int currentYear = java.time.Year.now().getValue();
-
-                Instant instant = Instant.parse(publishedAt);
-
-                int videoYear = instant
-                        .atZone(ZoneId.systemDefault())
-                        .getYear();
-
-                if(videoYear != currentYear){
-                    continue; // ❌ skip old videos
-                }
-                Map<String, Object> thumbnails = (Map<String, Object>) snippet.get("thumbnails");
-                Map<String, Object> high = (Map<String, Object>) thumbnails.get("high");
-                String thumbUrl = (high != null) ? (String) high.get("url") : "";
-
-                Video video = new Video();
-                video.setId(id);
-                video.setTitle(title);
-                video.setChannel(channel);
-                video.setContentType(seconds <= 60 ? "Short" : "Video");
-                video.setViews(views);
-                video.setDuration(seconds);
-                video.setPublishedAt(publishedAt);
-                video.setPublishedDateFormatted(formattedDate);
-                video.setKeyword(keyword);
-                video.setThumbnailUrl(thumbUrl);
-
-                repo.save(video);
-            }
+            repo.save(video);
         }
     }
 }

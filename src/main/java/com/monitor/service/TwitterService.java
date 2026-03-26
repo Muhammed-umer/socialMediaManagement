@@ -151,11 +151,9 @@ public class TwitterService {
     }
 
     private void ensureNotEmpty(List<Tweet> tweets) {
-        if (tweets.isEmpty()) {
-            System.out.println("🚨 EMPTY TWEETS - USING MOCK FALLBACK");
-            tweets.add(new Tweet("TechFan", "AI is the future 🚀", 1500, 200, 500, java.time.LocalDateTime.now().toString(), "Twitter Web App", "Positive"));
-            tweets.add(new Tweet("JavaDev", "Spring Boot is powerful", 800, 50, 200, java.time.LocalDateTime.now().toString(), "Twitter for iPhone", "Positive"));
-            tweets.add(new Tweet("Learner", "Learning AI step by step", 300, 20, 50, java.time.LocalDateTime.now().toString(), "Twitter Web App", "Neutral"));
+        if (tweets == null || tweets.isEmpty()) {
+            System.out.println("🚨 No tweets found");
+            // Do NOT throw exception
         }
     }
 
@@ -168,7 +166,7 @@ public class TwitterService {
                 String text = legacy.get("full_text").asText("");
 
                 // ✅ FIX: Strict Java-side filter. If the tweet doesn't have the hashtag, skip it!
-                if (!text.toLowerCase().contains(("#" + hashtag).toLowerCase())) {
+                if (text == null || text.isEmpty()) {
                     return;
                 }
 

@@ -20,8 +20,7 @@ public class YouTubeService {
 
     private final YouTubeClient client;
     private final VideoRepo repo;
-
-
+    private final AIService aiService;
 
     public void fetch(String keywordInput){
 
@@ -31,22 +30,30 @@ public class YouTubeService {
             String keyword = rawKeyword.trim();
             if(keyword.isEmpty()) continue;
 
-            Map<String, Object> res = client.search(keyword);
+            // Adding Erode context to the search naturally
+            String refinedKeyword = keyword + " Erode election district politics";
+
+            Map<String, Object> res = (Map<String, Object>) client.search(refinedKeyword);
             List<Map<String, Object>> items = (List<Map<String, Object>>) res.get("items");
 
-            List<String> ids = new ArrayList<>();
+            if (items == null) continue;
 
+            List<String> ids = new ArrayList<>();
             for(Map<String, Object> item : items){
                 Map<String, Object> idMap = (Map<String, Object>) item.get("id");
-                ids.add((String) idMap.get("videoId"));
+                if (idMap != null && idMap.get("videoId") != null) {
+                    ids.add((String) idMap.get("videoId"));
+                }
             }
 
-            Map<String, Object> details = client.getVideoDetails(String.join(",", ids));
-            List<Map<String, Object>> videos = (List<Map<String, Object>>) details.get("items");
+            if (ids.isEmpty()) continue;
 
-            for(Map<String, Object> v : videos){
+            Map<String, Object> details = (Map<String, Object>) client.getVideoDetails(String.join(",", ids));
+            List<Map<String, Object>> videosData = (List<Map<String, Object>>) details.get("items");
 
+            if (videosData == null) continue;
 
+            for(Map<String, Object> v : videosData){
                 String id = (String) v.get("id");
 
                 Map<String, Object> snippet = (Map<String, Object>) v.get("snippet");
@@ -56,34 +63,39 @@ public class YouTubeService {
                 String title = (String) snippet.get("title");
                 String channel = (String) snippet.get("channelTitle");
                 String publishedAt = (String) snippet.get("publishedAt");
-                String formattedDate = "";
+                
+                // Calculate relative time: HH:MM:SS ago
+                String publishedAgoStr = calculatePublishedAgo(publishedAt);
 
+                String formattedDate = "";
                 try {
                     Instant instant = Instant.parse(publishedAt);
-
-                    // include seconds in published timestamp
                     formattedDate = instant
                             .atZone(ZoneId.systemDefault())
                             .format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
-
                 } catch (Exception e) {
-                    formattedDate = publishedAt; // fallback
+                    formattedDate = publishedAt;
                 }
-                long views = Long.parseLong((String) stats.getOrDefault("viewCount", "0"));
+                
+                long views = 0;
+                try {
+                    views = Long.parseLong((String) stats.getOrDefault("viewCount", "0"));
+                } catch (Exception ignored) {}
 
                 String durationStr = (String) content.get("duration");
-                long seconds = java.time.Duration.parse(durationStr).getSeconds();
+                long seconds = 0;
+                try {
+                    seconds = java.time.Duration.parse(durationStr).getSeconds();
+                } catch (Exception ignored) {}
+
                 int currentYear = java.time.Year.now().getValue();
-
-                Instant instant = Instant.parse(publishedAt);
-
-                int videoYear = instant
-                        .atZone(ZoneId.systemDefault())
-                        .getYear();
+                Instant instantObj = Instant.parse(publishedAt);
+                int videoYear = instantObj.atZone(ZoneId.systemDefault()).getYear();
 
                 if(videoYear != currentYear){
                     continue; // ❌ skip old videos
                 }
+
                 Map<String, Object> thumbnails = (Map<String, Object>) snippet.get("thumbnails");
                 Map<String, Object> high = (Map<String, Object>) thumbnails.get("high");
                 String thumbUrl = (high != null) ? (String) high.get("url") : "";
@@ -97,11 +109,38 @@ public class YouTubeService {
                 video.setDuration(seconds);
                 video.setPublishedAt(publishedAt);
                 video.setPublishedDateFormatted(formattedDate);
+                video.setPublishedAgo(publishedAgoStr);
                 video.setKeyword(keyword);
                 video.setThumbnailUrl(thumbUrl);
 
+                // HuggingFace AI integration
+                try {
+                    Map<String, String> analysis = aiService.analyze(title + " " + channel + " content relating to elections and politics");
+                    video.setAiSummary(analysis.get("aiSummary"));
+                    video.setSentiment(analysis.get("sentiment"));
+                } catch (Exception e) {
+                    video.setAiSummary("AI Summary failed to generate.");
+                    video.setSentiment("Neutral");
+                }
+
                 repo.save(video);
             }
+        }
+    }
+
+    private String calculatePublishedAgo(String publishedAt) {
+        try {
+            Instant publishedInstant = Instant.parse(publishedAt);
+            Instant now = Instant.now();
+            java.time.Duration diff = java.time.Duration.between(publishedInstant, now);
+            
+            long hours = diff.toHours();
+            long minutes = diff.toMinutesPart();
+            long seconds = diff.toSecondsPart();
+            
+            return String.format("%02d:%02d:%02d ago", hours, minutes, seconds);
+        } catch (Exception e) {
+            return "N/A ago";
         }
     }
 }

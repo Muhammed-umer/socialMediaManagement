@@ -440,7 +440,6 @@
     </div>
     <a href="/dashboard" class="nav-item active">YouTube</a>
     <a href="/insta" class="nav-item">Instagram</a>
-    <a href="/insta2" class="nav-item">Insta 2.0</a>
 </nav>
 
 <div class="main-wrapper">
@@ -472,21 +471,20 @@
             hx-indicator="#loading"
             hx-swap="innerHTML">
             
-            <input type="hidden" name="keyword" id="finalKeywordInput">
-            
-            <div class="tag-input-container" onclick="document.getElementById('keywordEntry').focus()">
-                <div id="tagList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+            <div class="tag-input-container">
                 <input
                     type="text"
+                    name="keyword"
                     id="keywordEntry"
                     class="keyword-entry-field"
                     placeholder="Search using keyword"
+                    required
                     autocomplete="off">
             </div>
             <button type="submit" class="btn-search">Search Now</button>
         </form>
         <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">
-            Tip: Press <strong>Enter</strong> or <strong>Comma</strong> to add multiple keywords.
+            Search using a single keyword.
         </p>
         <div id="loading">
             <div class="spinner"></div>
@@ -500,12 +498,12 @@
                 <thead>
                     <tr>
                         <th style="width: 50px;">#</th>
-                        <th style="width: 32%;">Video Title</th>
+                        <th style="width: 35%;">Video Title</th>
                         <th>Channel</th>
-                        <th>Type</th>
+                        <th style="width: 150px;">AI Analysis</th>
                         <th>Views</th>
-                        <th>Duration</th>
                         <th>Published</th>
+                        <th>Published Ago</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -521,67 +519,6 @@
 </div> <!-- main-wrapper -->
 
 <script>
-    const form = document.getElementById('searchForm');
-    const input = document.getElementById('keywordEntry');
-    const tagList = document.getElementById('tagList');
-    const finalInput = document.getElementById('finalKeywordInput');
-    let tags = [];
-
-    function updateTagsUI() {
-        tagList.innerHTML = '';
-        tags.forEach((tag, index) => {
-            const tagEl = document.createElement('div');
-            tagEl.className = 'tag';
-            tagEl.innerHTML = `<span>${tag}</span><span class="tag-remove" onclick="removeTag(${index})">&times;</span>`;
-            tagList.appendChild(tagEl);
-        });
-        
-        // Sync with hidden input
-        finalInput.value = tags.join(',');
-        
-        // Dynamic placeholder
-        input.placeholder = tags.length > 0 ? '' : 'Search using keyword';
-    }
-
-    window.removeTag = function(index) {
-        tags.splice(index, 1);
-        updateTagsUI();
-    };
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            const val = input.value.trim().replace(/,/g, '');
-            if (val && !tags.includes(val)) {
-                tags.push(val);
-                input.value = '';
-                updateTagsUI();
-            }
-        } else if (e.key === 'Backspace' && !input.value && tags.length > 0) {
-            tags.pop();
-            updateTagsUI();
-        }
-    });
-
-    document.body.addEventListener('htmx:configRequest', (event) => {
-        if (event.detail.elt.id === 'searchForm') {
-            const currentVal = input.value.trim();
-            if (currentVal && !tags.includes(currentVal)) {
-                tags.push(currentVal);
-                input.value = '';
-                updateTagsUI();
-            }
-            
-            // Re-sync final input one last time
-            finalInput.value = tags.join(',');
-
-            if (tags.length === 0) {
-                event.preventDefault();
-                alert('Please add at least one keyword.');
-            }
-        }
-    });
-
     // Mouse Follow Preview Logic
     document.addEventListener('mousemove', (e) => {
         const row = e.target.closest('.video-row');

@@ -8,7 +8,7 @@ spring:
     password: postgres
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update 
     show-sql: true
 server:
   port: 9090
@@ -17,9 +17,14 @@ instagram:
   accessToken: INSTAGRAM_TOKEN_PLACEHOLDER
   businessAccountId: "17841443190536872"
 
+<<<<<<< HEAD
 twitter:
   apiKey: deb242b238msh26a8efc5c285899p12dfa5jsnac8a1f7cf649
   host: twitter241.p.rapidapi.com
 
 huggingface:
   apiKey: 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
+=======
+huggingface:
+  apiKey: "HUGGINGFACE_API_KEY_PLACEHOLDER" # Add your Hugging Face API key here
+>>>>>>> 6ae8f27 (Rewriting he youtube monitoring)

@@ -17,9 +17,14 @@ instagram:
   accessToken: INSTAGRAM_TOKEN_PLACEHOLDER
   businessAccountId: "17841443190536872"
 
+<<<<<<< HEAD
+huggingface:
+  apiKey: "HUGGINGFACE_API_KEY_PLACEHOLDER" # Add your Hugging Face API key here
+=======
 twitter:
   apiKey: deb242b238msh26a8efc5c285899p12dfa5jsnac8a1f7cf649
   host: twitter241.p.rapidapi.com
 
 huggingface:
   apiKey: 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
+>>>>>>> d7bd553bda553cd7311509f497c9dea1a5b538ff

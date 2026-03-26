@@ -24,7 +24,7 @@ public class Video {
 
     private String thumbnailUrl;
 
-    @jakarta.persistence.Column(length = 1000)
+    @jakarta.persistence.Column(columnDefinition = "TEXT")
     private String aiSummary;
     private String sentiment; // Positive, Negative, Neutral
     private String publishedAgo; // HH:MM:SS ago

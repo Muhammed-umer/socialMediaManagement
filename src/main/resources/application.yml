@@ -1,30 +1,26 @@
 youtube:
-  apiKey: YOUTUBE_API_KEY_PLACEHOLDER
+  apiKey: ${YOUTUBE_API_KEY}
 
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/social_monitor
-    username: postgres
-    password: postgres
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update 
     show-sql: true
+
 server:
   port: 9090
 
 instagram:
-  accessToken: INSTAGRAM_TOKEN_PLACEHOLDER
-  businessAccountId: "17841443190536872"
+  accessToken: ${INSTAGRAM_ACCESS_TOKEN}
+  businessAccountId: ${INSTAGRAM_BUSINESS_ID}
 
-<<<<<<< HEAD
 twitter:
-  apiKey: deb242b238msh26a8efc5c285899p12dfa5jsnac8a1f7cf649
-  host: twitter241.p.rapidapi.com
+  apiKey: ${TWITTER_API_KEY}
+  host: ${TWITTER_HOST}
 
 huggingface:
-  apiKey: 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
-=======
-huggingface:
-  apiKey: "HUGGINGFACE_API_KEY_PLACEHOLDER" # Add your Hugging Face API key here
->>>>>>> 6ae8f27 (Rewriting he youtube monitoring)
+  apiKey: ${HUGGINGFACE_API_KEY}

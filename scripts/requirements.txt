@@ -1,2 +1,4 @@
 instaloader==4.10.1
 vaderSentiment==3.3.2
+youtube-transcript-api==0.6.2
+requests==2.31.0

@@ -9,19 +9,18 @@ import lombok.Data;
 public class Video {
     @Id
     private String id;
-
     private String title;
     private String channel;
-    private String contentType; // "Video" or "Short"
-
     private Long views;
-    private Long duration; // seconds
+    private Long duration; // stored in seconds
     private String publishedAt;
     private String publishedDateFormatted;
 
-    /** The search keyword that was used to fetch this video */
     private String keyword;
+    private String sentiment;
+    @jakarta.persistence.Column(columnDefinition = "TEXT")
+    private String summary;
 
+    private String contentType;
     private String thumbnailUrl;
-
 }

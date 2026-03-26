@@ -7,7 +7,7 @@
 
     <!-- Empty state when no videos found -->
     <tr th:if="${#lists.isEmpty(videos)}">
-        <td colspan="7">
+        <td colspan="9">
             <div style="padding: 60px 24px; text-align: center; color: #94a3b8;">
                 <div style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;">🔍</div>
                 <p style="font-size: 16px; font-weight: 600; color: #475569; margin-bottom: 4px;">No videos found for this keyword</p>
@@ -72,6 +72,30 @@
 
         <!-- Published Date -->
         <td th:text="${v.publishedDateFormatted}" style="color: #64748b; font-size: 13px;"></td>
+
+        <!-- Sentiment -->
+        <td>
+            <span th:if="${v.sentiment == 'positive'}" style="background: #ecfdf5; color: #059669; padding: 4px 10px; border-radius: 100px; font-weight: 600; font-size: 12px; display: inline-block; text-align: center; width: 70px;">Positive</span>
+            <span th:if="${v.sentiment == 'negative'}" style="background: #fef2f2; color: #dc2626; padding: 4px 10px; border-radius: 100px; font-weight: 600; font-size: 12px; display: inline-block; text-align: center; width: 70px;">Negative</span>
+            <span th:if="${v.sentiment == 'neutral' or v.sentiment == null}" style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 100px; font-weight: 600; font-size: 12px; display: inline-block; text-align: center; width: 70px;">Neutral</span>
+        </td>
+
+        <!-- Summary -->
+        <td style="position: relative;" class="summary-cell">
+            <style>
+                .summary-cell { position: relative; }
+                .summary-text { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; color: #475569; cursor: help; }
+                .custom-tooltip { visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 0; transform: translateY(-8px); background: #1e293b; color: #f8fafc; padding: 12px; border-radius: 8px; width: max-content; max-width: 400px; white-space: normal; z-index: 1000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); font-size: 13px; transition: all 0.2s ease-in-out; pointer-events: none; line-height: 1.5; text-align: left; }
+                .custom-tooltip::after { content: ''; position: absolute; top: 100%; left: 24px; border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent; }
+                .summary-cell:hover .custom-tooltip { visibility: visible; opacity: 1; transform: translateY(0); pointer-events: auto; }
+            </style>
+            <div class="summary-text" th:text="${v.summary != null ? v.summary : 'No summary'}"></div>
+            <!-- Custom Tooltip -->
+            <div class="custom-tooltip" th:if="${v.summary != null}">
+                <strong style="color: #94a3b8; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Detailed Summary (English)</strong>
+                <span th:text="${v.summary}"></span>
+            </div>
+        </td>
 
     </tr>
 
